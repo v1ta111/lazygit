@@ -186,6 +186,7 @@ func TestCommitShowCmdObj(t *testing.T) {
 		filterPath       string
 		contextSize      int
 		ignoreWhitespace bool
+		extDiffCmd       string
 		expected         []string
 	}
 
@@ -195,6 +196,7 @@ func TestCommitShowCmdObj(t *testing.T) {
 			filterPath:       "",
 			contextSize:      3,
 			ignoreWhitespace: false,
+			extDiffCmd:       "",
 			expected:         []string{"show", "--submodule", "--no-ext-diff", "--color=always", "--unified=3", "--stat", "--decorate", "-p", "1234567890"},
 		},
 		{
@@ -202,6 +204,7 @@ func TestCommitShowCmdObj(t *testing.T) {
 			filterPath:       "file.txt",
 			contextSize:      3,
 			ignoreWhitespace: false,
+			extDiffCmd:       "",
 			expected:         []string{"show", "--submodule", "--no-ext-diff", "--color=always", "--unified=3", "--stat", "--decorate", "-p", "1234567890", "--", "file.txt"},
 		},
 		{
@@ -209,6 +212,7 @@ func TestCommitShowCmdObj(t *testing.T) {
 			filterPath:       "",
 			contextSize:      77,
 			ignoreWhitespace: false,
+			extDiffCmd:       "",
 			expected:         []string{"show", "--submodule", "--no-ext-diff", "--color=always", "--unified=77", "--stat", "--decorate", "-p", "1234567890"},
 		},
 		{
@@ -216,7 +220,16 @@ func TestCommitShowCmdObj(t *testing.T) {
 			filterPath:       "",
 			contextSize:      77,
 			ignoreWhitespace: true,
+			extDiffCmd:       "",
 			expected:         []string{"show", "--submodule", "--no-ext-diff", "--color=always", "--unified=77", "--stat", "--decorate", "-p", "1234567890", "--ignore-all-space"},
+		},
+		{
+			testName:         "Show diff with external diff command",
+			filterPath:       "",
+			contextSize:      3,
+			ignoreWhitespace: false,
+			extDiffCmd:       "difft --color=always",
+			expected:         []string{"-c", "diff.external=difft --color=always", "show", "--submodule", "--ext-diff", "--color=always", "--unified=3", "--stat", "--decorate", "-p", "1234567890"},
 		},
 	}
 
@@ -225,6 +238,7 @@ func TestCommitShowCmdObj(t *testing.T) {
 		t.Run(s.testName, func(t *testing.T) {
 			userConfig := config.GetDefaultConfig()
 			userConfig.Git.DiffContextSize = s.contextSize
+			userConfig.Git.Paging.ExternalDiffCommand = s.extDiffCmd
 
 			runner := oscommands.NewFakeRunner(t).ExpectGitArgs(s.expected, "", nil)
 			instance := buildCommitCommands(commonDeps{userConfig: userConfig, runner: runner})

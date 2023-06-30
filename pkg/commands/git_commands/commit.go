@@ -199,9 +199,11 @@ func (self *CommitCommands) AmendHeadCmdObj() oscommands.ICmdObj {
 func (self *CommitCommands) ShowCmdObj(sha string, filterPath string, ignoreWhitespace bool) oscommands.ICmdObj {
 	contextSize := self.UserConfig.Git.DiffContextSize
 
+	extDiffCmd := self.UserConfig.Git.Paging.ExternalDiffCommand
 	cmdArgs := NewGitCmd("show").
+		ConfigIf(extDiffCmd != "", "diff.external="+extDiffCmd).
 		Arg("--submodule").
-		Arg("--no-ext-diff").
+		ArgIfElse(extDiffCmd == "", "--no-ext-diff", "--ext-diff").
 		Arg("--color="+self.UserConfig.Git.Paging.ColorArg).
 		Arg(fmt.Sprintf("--unified=%d", contextSize)).
 		Arg("--stat").
