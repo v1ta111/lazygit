@@ -207,7 +207,7 @@ func (self *BranchesController) press(selectedBranch *models.Branch) error {
 }
 
 func (self *BranchesController) handleCreatePullRequest(selectedBranch *models.Branch) error {
-	if len(selectedBranch.UpstreamBranch) == 0 {
+	if !selectedBranch.IsTrackingRemote() {
 		return self.c.ErrorMsg(self.c.Tr.PullRequestNoUpstream)
 	}
 	return self.createPullRequest(selectedBranch.UpstreamBranch, "")
@@ -464,10 +464,7 @@ func (self *BranchesController) createPullRequestMenu(selectedBranch *models.Bra
 			{
 				LabelColumns: fromToLabelColumns(branch.Name, self.c.Tr.DefaultBranch),
 				OnPress: func() error {
-					if len(branch.UpstreamBranch) == 0 {
-						return self.c.ErrorMsg(self.c.Tr.PullRequestNoUpstream)
-					}
-					return self.createPullRequest(branch.Name, "")
+					return self.handleCreatePullRequest(branch)
 				},
 			},
 			{
@@ -477,13 +474,6 @@ func (self *BranchesController) createPullRequestMenu(selectedBranch *models.Bra
 						Title:               branch.Name + " →",
 						FindSuggestionsFunc: self.c.Helpers().Suggestions.GetRemoteBranchesSuggestionsFunc("/"),
 						HandleConfirm: func(targetBranchName string) error {
-							upstreamExists := false
-							for _, remoteBranch := range self.c.Model().RemoteBranches {
-								upstreamExists = upstreamExists || remoteBranch.Name == targetBranchName
-							}
-							if !upstreamExists {
-								return self.c.ErrorMsg(self.c.Tr.PullRequestNoUpstream)
-							}
 							return self.createPullRequest(branch.Name, targetBranchName)
 						},
 					})
@@ -497,10 +487,10 @@ func (self *BranchesController) createPullRequestMenu(selectedBranch *models.Bra
 			&types.MenuItem{
 				LabelColumns: fromToLabelColumns(checkedOutBranch.Name, selectedBranch.Name),
 				OnPress: func() error {
-					if len(checkedOutBranch.UpstreamBranch) == 0 || len(selectedBranch.UpstreamBranch) == 0 {
+					if !checkedOutBranch.IsTrackingRemote() || !selectedBranch.IsTrackingRemote() {
 						return self.c.ErrorMsg(self.c.Tr.PullRequestNoUpstream)
 					}
-					return self.createPullRequest(checkedOutBranch.Name, selectedBranch.Name)
+					return self.createPullRequest(checkedOutBranch.UpstreamBranch, selectedBranch.UpstreamBranch)
 				},
 			},
 		)

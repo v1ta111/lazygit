@@ -140,6 +140,7 @@ var tests = []*components.IntegrationTest{
 	misc.ConfirmOnQuit,
 	misc.InitialOpen,
 	misc.RecentReposOnLaunch,
+	misc.OpenPullRequest,
 	patch_building.Apply,
 	patch_building.ApplyInReverse,
 	patch_building.ApplyInReverseWithConflict,
