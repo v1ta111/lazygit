@@ -41,6 +41,18 @@ func (self *AppStatusHelper) WithWaitingStatus(message string, f func(gocui.Task
 	})
 }
 
+func (self *AppStatusHelper) WithWaitingStatusSync(message string, f func() error) {
+	self.statusMgr().WithWaitingStatus(message, func() {
+		stop := make(chan struct{})
+		defer func() { stop <- struct{}{} }()
+		self.renderAppStatusSync(stop)
+
+		if err := f(); err != nil {
+			_ = self.c.Error(err)
+		}
+	})
+}
+
 func (self *AppStatusHelper) HasStatus() bool {
 	return self.statusMgr().HasStatus()
 }
@@ -65,4 +77,22 @@ func (self *AppStatusHelper) renderAppStatus() {
 			}
 		}
 	})
+}
+
+func (self *AppStatusHelper) renderAppStatusSync(stop chan struct{}) {
+	ticker := time.NewTicker(time.Millisecond * 50)
+	go func() {
+	outer:
+		for {
+			select {
+			case <-ticker.C:
+				appStatus := self.statusMgr().GetStatusString()
+				self.c.SetViewContent(self.c.Views().AppStatus, appStatus)
+				_ = self.c.GocuiGui().ForceRedrawView(self.c.Views().AppStatus)
+			case <-stop:
+				break outer
+			}
+		}
+		ticker.Stop()
+	}()
 }

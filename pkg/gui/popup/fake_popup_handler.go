@@ -41,6 +41,10 @@ func (self *FakePopupHandler) WithWaitingStatus(message string, f func(gocui.Tas
 	return f(gocui.NewFakeTask())
 }
 
+func (self *FakePopupHandler) WithWaitingStatusSync(message string, f func() error) error {
+	return f()
+}
+
 func (self *FakePopupHandler) Menu(opts types.CreateMenuOptions) error {
 	panic("not yet implemented")
 }

@@ -131,6 +131,7 @@ type IPopupHandler interface {
 	Prompt(opts PromptOpts) error
 	WithLoaderPanel(message string, f func(gocui.Task) error) error
 	WithWaitingStatus(message string, f func(gocui.Task) error) error
+	WithWaitingStatusSync(message string, f func() error) error
 	Menu(opts CreateMenuOptions) error
 	Toast(message string)
 	GetPromptInput() string
