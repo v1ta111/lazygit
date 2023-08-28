@@ -225,11 +225,13 @@ func TestCommitShowCmdObj(t *testing.T) {
 		t.Run(s.testName, func(t *testing.T) {
 			userConfig := config.GetDefaultConfig()
 			userConfig.Git.DiffContextSize = s.contextSize
+			appState := &config.AppState{}
+			appState.IgnoreWhitespaceInDiffView = s.ignoreWhitespace
 
 			runner := oscommands.NewFakeRunner(t).ExpectGitArgs(s.expected, "", nil)
-			instance := buildCommitCommands(commonDeps{userConfig: userConfig, runner: runner})
+			instance := buildCommitCommands(commonDeps{userConfig: userConfig, appState: appState, runner: runner})
 
-			assert.NoError(t, instance.ShowCmdObj("1234567890", s.filterPath, s.ignoreWhitespace).Run())
+			assert.NoError(t, instance.ShowCmdObj("1234567890", s.filterPath).Run())
 			runner.CheckForMissingCalls()
 		})
 	}
