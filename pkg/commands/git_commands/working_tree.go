@@ -240,7 +240,7 @@ func (self *WorkingTreeCommands) WorktreeFileDiffCmdObj(node models.IFile, plain
 		colorArg = "never"
 	}
 
-	contextSize := self.UserConfig.Git.DiffContextSize
+	contextSize := self.AppState.DiffContextSize
 	prevPath := node.GetPreviousPath()
 	noIndex := !node.GetIsTracked() && !node.GetHasStagedChanges() && !cached && node.GetIsFile()
 
@@ -268,7 +268,7 @@ func (self *WorkingTreeCommands) ShowFileDiff(from string, to string, reverse bo
 }
 
 func (self *WorkingTreeCommands) ShowFileDiffCmdObj(from string, to string, reverse bool, fileName string, plain bool) oscommands.ICmdObj {
-	contextSize := self.UserConfig.Git.DiffContextSize
+	contextSize := self.AppState.DiffContextSize
 
 	colorArg := self.UserConfig.Git.Paging.ColorArg
 	if plain {

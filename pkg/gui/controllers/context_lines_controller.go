@@ -65,7 +65,8 @@ func (self *ContextLinesController) Increase() error {
 			return self.c.Error(err)
 		}
 
-		self.c.UserConfig.Git.DiffContextSize = self.c.UserConfig.Git.DiffContextSize + 1
+		self.c.AppState.DiffContextSize++
+		self.c.SaveAppStateAndLogError()
 		return self.applyChange()
 	}
 
@@ -73,14 +74,15 @@ func (self *ContextLinesController) Increase() error {
 }
 
 func (self *ContextLinesController) Decrease() error {
-	old_size := self.c.UserConfig.Git.DiffContextSize
+	old_size := self.c.AppState.DiffContextSize
 
 	if self.isShowingDiff() && old_size > 1 {
 		if err := self.checkCanChangeContext(); err != nil {
 			return self.c.Error(err)
 		}
 
-		self.c.UserConfig.Git.DiffContextSize = old_size - 1
+		self.c.AppState.DiffContextSize = old_size - 1
+		self.c.SaveAppStateAndLogError()
 		return self.applyChange()
 	}
 
