@@ -962,7 +962,7 @@ func EnglishTranslationSet() TranslationSet {
 		ToggleStagingPanel:                  `Switch to other panel (staged/unstaged changes)`,
 		ReturnToFilesPanel:                  `Return to files panel`,
 		FastForward:                         `Fast-forward this branch from its upstream`,
-		Fetching:                            "Fetching and fast-forwarding {{.from}} -> {{.to}} ...",
+		Fetching:                            "Fetching {{.branch}}",
 		FoundConflictsTitle:                 "Conflicts!",
 		ViewConflictsMenuItem:               "View conflicts",
 		AbortMenuItem:                       "Abort the %s",
