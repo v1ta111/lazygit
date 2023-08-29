@@ -204,9 +204,15 @@ func (self *WindowArrangementHelper) infoSectionChildren(informationStr string, 
 		if self.c.InDemo() {
 			// app status appears very briefly in demos and dislodges the caption,
 			// so better not to show it at all
-			appStatusBox.Size = 0
+			// size is one in this case because we always want the options view
+			// to be indented by one
+			appStatusBox.Size = 1
+		} else if len(appStatus) != 0 {
+			// add two for a space before and after
+			appStatusBox.Size = 2 + runewidth.StringWidth(appStatus)
 		} else {
-			appStatusBox.Size = runewidth.StringWidth(INFO_SECTION_PADDING) + runewidth.StringWidth(appStatus)
+			// just one space
+			appStatusBox.Size = 1
 		}
 	}
 

@@ -56,7 +56,7 @@ func (self *AppStatusHelper) renderAppStatus() {
 		for range ticker.C {
 			appStatus := self.statusMgr().GetStatusString()
 			self.c.OnUIThread(func() error {
-				self.c.SetViewContent(self.c.Views().AppStatus, appStatus)
+				self.c.SetViewContent(self.c.Views().AppStatus, " "+appStatus)
 				return nil
 			})
 
