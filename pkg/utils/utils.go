@@ -25,15 +25,15 @@ func GetProjectRoot() string {
 }
 
 // The duration between two frames of the loader animation in milliseconds
-const LoaderAnimationInterval = 50
+const LoaderAnimationInterval = 120
 
 // Loader dumps a string to be displayed as a loader
 func Loader() string {
-	characters := "|/-\\"
+	strings := []string{"•   ", " •  ", "  • ", "   •", "  • ", " •  "}
 	now := time.Now()
 	milliseconds := now.UnixMilli()
-	index := milliseconds / LoaderAnimationInterval % int64(len(characters))
-	return characters[index : index+1]
+	index := milliseconds / LoaderAnimationInterval % int64(len(strings))
+	return "[" + strings[index] + "]"
 }
 
 // Min returns the minimum of two integers
