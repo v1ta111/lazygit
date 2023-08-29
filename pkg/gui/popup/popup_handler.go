@@ -3,11 +3,9 @@ package popup
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/jesseduffield/gocui"
 	"github.com/jesseduffield/lazygit/pkg/common"
-	gctx "github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/sasha-s/go-deadlock"
@@ -126,47 +124,6 @@ func (self *PopupHandler) Prompt(opts types.PromptOpts) error {
 		FindSuggestionsFunc: opts.FindSuggestionsFunc,
 		Mask:                opts.Mask,
 	})
-}
-
-func (self *PopupHandler) WithLoaderPanel(message string, f func(gocui.Task) error) error {
-	index := 0
-	self.Lock()
-	self.index++
-	index = self.index
-	self.Unlock()
-
-	ctx, cancel := context.WithCancel(context.Background())
-
-	err := self.createPopupPanelFn(ctx, types.CreatePopupPanelOpts{
-		Prompt:    message,
-		HasLoader: true,
-	})
-	if err != nil {
-		self.Log.Error(err)
-		cancel()
-		return nil
-	}
-
-	self.onWorker(func(task gocui.Task) {
-		// emulating a delay due to network latency
-		if self.inDemo() {
-			time.Sleep(500 * time.Millisecond)
-		}
-
-		if err := f(task); err != nil {
-			self.Log.Error(err)
-		}
-
-		cancel()
-
-		self.Lock()
-		if index == self.index && self.currentContextFn().GetKey() == gctx.CONFIRMATION_CONTEXT_KEY {
-			_ = self.popContextFn()
-		}
-		self.Unlock()
-	})
-
-	return nil
 }
 
 // returns the content that has currently been typed into the prompt. Useful for
